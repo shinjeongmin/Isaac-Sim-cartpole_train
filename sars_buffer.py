@@ -1,13 +1,13 @@
 from typing import TypedDict
 import numpy as np
 
-# Sars type -> s_t, a, r, s_tp1 -> 4 * [float] + 1 * [float] + 1 * [float] + 4 * [float] = 10 * [float]
+# Sars type -> s_t, a, r, s_tp1, done -> 4 * [float] + 1 * [float] + 1 * [float] + 4 * [float] + 1 *[float] = 11 * [float]
 
 class SarsBuffer:
   data: np.ndarray[np.ndarray[float]]
 
   def __init__ (self):
-    self.data = np.zeros((0, 10), dtype=np.float32)
+    self.data = np.zeros((0, 11), dtype=np.float32)
   
   def sample (self, sample_num: int):
     if self.data.shape[0] < sample_num:

@@ -36,6 +36,7 @@ env: Env = {
 import torch
 from model.actor import Actor
 from model.critic import Critic
+from utils import hard_update
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -43,6 +44,8 @@ actor = Actor().to(device)
 critic = Critic().to(device)
 target_actor = Actor().to(device)
 target_critic = Critic().to(device)
+hard_update(target_actor, actor)
+hard_update(target_critic, critic)
 
 
 from sars_buffer import SarsBuffer, SizeLimmitedSarsPushBuffer

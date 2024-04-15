@@ -19,7 +19,6 @@ class EpisodeRunner:
     self.simulation_seconds = simulation_seconds
 
   def run_episode (self):
-    cnt = 0
     for _ in range(self.episode_num):
       self.env['world'].reset()
       self.env['cartpoles'].set_joint_positions(positions=np.concatenate([np.zeros((self.env['xn'] * self.env['yn'], 1), dtype=np.float32), np.random.normal(size=(self.env['xn'] * self.env['yn'], 1)) * np.pi / 6], axis=1), joint_indices=[0, 1])
@@ -36,11 +35,6 @@ class EpisodeRunner:
               joint_positions[:, [1]],
               joint_velocities[:, [1]]
             ], axis=1)
-          )
-          a = self.actor(state.to(self.device))
-          if cnt >= 100:
-            print('a:', a)
-            cnt = 0
-          else:
-            cnt += 1
+          ).to(self.device)
+          a = self.actor(state.to(self.device)) + torch.from_numpy(np.random.normal(size=(self.env['xn'] * self.env['yn'], 1)) * 1.0).to(self.device)
         self.stepper.step(a.detach().cpu().numpy())

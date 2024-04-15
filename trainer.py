@@ -27,10 +27,11 @@ class Trainer:
       return ([-1234, -1234])
 
     with torch.no_grad():
-      target_next_state = torch.from_numpy(sars_data[:, 6: ]).to(self.device, dtype=torch.float32)
+      target_next_state = torch.from_numpy(sars_data[:, 6: 10]).to(self.device, dtype=torch.float32)
       target_next_action = self.target_actor(target_next_state)
       q_target = torch.from_numpy(sars_data[:, [5]]).to(self.device, dtype=torch.float32) \
-        + self.gamma * self.target_critic(torch.cat([target_next_state, target_next_action], dim=1))
+        + self.gamma * (1.0 - torch.from_numpy(sars_data[:, [10]]).to(self.device, dtype=torch.float32)) \
+        * self.target_critic(torch.cat([target_next_state, target_next_action], dim=1))
     q = self.critic(torch.from_numpy(sars_data[:, 0: 5]).to(self.device, dtype=torch.float32))
     critic_loss = self.critic_criterion(q, q_target)
     self.critic_optimizer.zero_grad()

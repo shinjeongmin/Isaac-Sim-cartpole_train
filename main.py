@@ -50,7 +50,7 @@ hard_update(target_critic, critic)
 
 from sars_buffer import SarsBuffer, SizeLimmitedSarsPushBuffer
 
-sars_buffer = SizeLimmitedSarsPushBuffer(SarsBuffer(), 20000)
+sars_buffer = SizeLimmitedSarsPushBuffer(SarsBuffer(), 10000)
 
 
 from episode_runner import EpisodeRunner
@@ -70,7 +70,7 @@ episode_runner = EpisodeRunner(
     agent_over_manager,
     sars_buffer,
     env['xn'] * env['yn']
-  ), env, actor, critic, agent_over_manager, 10000, 10, device
+  ), env, actor, critic, agent_over_manager, 1000, 5, device
 )
 episode_runner.run_episode()
 

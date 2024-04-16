@@ -13,7 +13,7 @@ class Stepper:
     self.render = render
 
   def step (self, a: np.ndarray):
-    self.cartpoles.set_joint_efforts(efforts=np.reshape(a, (-1, 1)) * 5, joint_indices=np.repeat(0, a.shape[0]))
+    self.cartpoles.set_joint_efforts(efforts=np.reshape(a, (-1, 1)) * 100, joint_indices=np.repeat(0, a.shape[0]))
     self.world.step(render=self.render)
 
 class StepForTrain (Stepper):
@@ -32,24 +32,28 @@ class StepForTrain (Stepper):
     cur_joint_positions = self.cartpoles.get_joint_positions(joint_indices=[0, 1])
     cur_joint_velocities = self.cartpoles.get_joint_velocities(joint_indices=[0, 1])
 
+    prev_over_table = np.array(self.agent_over_manager.over_table)
+    prev_live_table = np.logical_not(prev_over_table)
     self.agent_over_manager.update(cur_joint_positions)
     cur_over_table = np.array(self.agent_over_manager.over_table)
 
     reward = np.zeros((self.agent_num, 1), dtype=np.float32)
-    reward[np.expand_dims(np.logical_not(cur_over_table), axis=1)] = 1.0
+    reward += 0.1
+    reward -= np.abs(cur_joint_positions[:, [0]]) * 0.01
+    reward[np.expand_dims(cur_over_table, axis=1)] = -1.0
 
     new_sars = np.concatenate([
-      prev_joint_positions[:, [0]],
-      prev_joint_velocities[:, [0]],
-      prev_joint_positions[:, [1]],
-      prev_joint_velocities[:, [1]],
-      a[:, [0]],
-      reward[:, [0]],
-      cur_joint_positions[:, [0]],
-      cur_joint_velocities[:, [0]],
-      cur_joint_positions[:, [1]],
-      cur_joint_velocities[:, [1]],
-      np.expand_dims(np.array(cur_over_table, dtype=np.float32), axis=1)
+      prev_joint_positions[prev_live_table][:, [0]],
+      prev_joint_velocities[prev_live_table][:, [0]],
+      prev_joint_positions[prev_live_table][:, [1]],
+      prev_joint_velocities[prev_live_table][:, [1]],
+      a[prev_live_table][:, [0]],
+      reward[prev_live_table][:, [0]],
+      cur_joint_positions[prev_live_table][:, [0]],
+      cur_joint_velocities[prev_live_table][:, [0]],
+      cur_joint_positions[prev_live_table][:, [1]],
+      cur_joint_velocities[prev_live_table][:, [1]],
+      np.expand_dims(np.array(cur_over_table, dtype=np.float32), axis=1)[prev_live_table][:, [0]]
     ], axis=1)
 
     self.sars_buffer.push(new_sars)

@@ -21,7 +21,7 @@ class EpisodeRunner:
   def run_episode (self):
     for _ in range(self.episode_num):
       self.env['world'].reset()
-      self.env['cartpoles'].set_joint_positions(positions=np.concatenate([np.zeros((self.env['xn'] * self.env['yn'], 1), dtype=np.float32), np.random.normal(size=(self.env['xn'] * self.env['yn'], 1)) * np.pi / 6], axis=1), joint_indices=[0, 1])
+      self.env['cartpoles'].set_joint_positions(positions=np.concatenate([np.zeros((self.env['xn'] * self.env['yn'], 1), dtype=np.float32), np.clip(np.random.normal(size=(self.env['xn'] * self.env['yn'], 1)), -2.0, 2.0) * np.pi / 6], axis=1), joint_indices=[0, 1])
       self.env['cartpoles'].set_joint_velocities(velocities=np.concatenate([np.zeros((self.env['xn'] * self.env['yn'], 1), dtype=np.float32), np.zeros((self.env['xn'] * self.env['yn'], 1), dtype=np.float32)], axis=1), joint_indices=[0, 1])
       self.agent_over_manager.init()
       for _ in range(round(self.simulation_seconds / self.env['physics_dt'])):
@@ -36,5 +36,5 @@ class EpisodeRunner:
               joint_velocities[:, [1]]
             ], axis=1)
           ).to(self.device)
-          a = self.actor(state.to(self.device)) + torch.from_numpy(np.random.normal(size=(self.env['xn'] * self.env['yn'], 1)) * 1.0).to(self.device)
+          a = self.actor(state.to(self.device)) + torch.from_numpy(np.clip(np.random.normal(size=(self.env['xn'] * self.env['yn'], 1)) * 0.2, -0.4, 0.4)).to(self.device)
         self.stepper.step(a.detach().cpu().numpy())

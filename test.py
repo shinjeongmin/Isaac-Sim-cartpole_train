@@ -2,28 +2,12 @@ from model.actor import Actor
 from model.critic import Critic
 import torch
 import numpy as np
+from safetensors.torch import load_model, save_model
+import os
 
 actor = Actor()
 critic = Critic()
 
-state = np.array([
-  [ 3.0000e+00,  9.3255e-10,  5.2292e+00, -2.1642e+00],
-  [ 3.0000e+00,  2.3879e-09, -1.4032e+00, -3.9032e+00],
-  [ 3.0000e+00,  9.1595e-10, -9.8006e-01, -1.7100e+00],
-  [ 2.9697e+00, -6.5857e-02,  1.2380e+00, -1.3129e+00],
-  [ 3.0000e+00,  3.4009e-09, -2.4294e+00, -4.5061e+00],
-  [ 2.9988e+00,  7.1945e-03,  2.9327e+00,  6.9457e+00],
-  [ 3.0000e+00,  2.3729e-09, -1.2858e+00,  3.5841e+00],
-  [ 2.9992e+00, -3.5380e-02, -4.2468e+00,  6.0800e+00],
-  [ 2.9859e+00,  1.3666e-01,  1.7425e+00,  4.7766e+00],
-  [ 2.9962e+00,  3.3383e-03, -3.4316e+00,  6.7287e+00],
-  [ 2.9939e+00,  7.9648e-02,  2.1717e+00,  5.8269e+00],
-  [ 3.0000e+00,  5.2098e-09,  3.7537e+00,  6.7244e+00],
-  [ 3.0000e+00,  9.0784e-10,  5.3093e+00, -1.6649e+00],
-  [ 3.0000e+00,  7.1258e-10,  5.2044e+00, -1.0343e+00]
-], dtype=np.float32)
+print(os.path.join(os.getcwd(), 'custom_standalones/cartpole_train/ckpt/model.safetensors'))
 
-x = torch.from_numpy(state)
-y = actor(x)
-
-print(x, y)
+save_model(actor, os.path.join(os.getcwd(), 'custom_standalones/cartpole_train/ckpt/model.safetensors'))

@@ -65,7 +65,7 @@ episode_runner = EpisodeRunner(
     env['cartpoles'], Stepper(env['world'], env['cartpoles'], True),
     TrainWithCallback(
       Trainer(actor, critic, target_actor, target_critic, sars_buffer, 0.99, device),
-      callbacks=[TrainMonitor(), TrainSaver(), TrainEvaluator()]
+      callbacks=[TrainMonitor(), TrainSaver(actor, critic, target_actor, target_critic), TrainEvaluator()]
     ),
     agent_over_manager,
     sars_buffer,
